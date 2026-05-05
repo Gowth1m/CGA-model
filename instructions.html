@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructions - 3D Car Showroom</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { overflow-y: auto; background-color: #050505; }
+        .instructions-container { padding: 4rem; max-width: 800px; margin: 0 auto; pointer-events: auto; }
+        .instructions-container h1 { font-size: 3rem; margin-bottom: 2rem; }
+        .instruction-step { background: #1a1a1a; border: 1px solid #333; padding: 2rem; margin-bottom: 1.5rem; border-radius: 8px; transition: border-color 0.3s; }
+        .instruction-step:hover { border-color: #cc0000; }
+        .instruction-step h2 { font-size: 1.5rem; margin-bottom: 1rem; color: #cc0000; display: flex; align-items: center; gap: 0.5rem; }
+        .instruction-step p { color: #ccc; line-height: 1.6; }
+        @media (max-width: 768px) { .instructions-container { padding: 2rem; } }
+    </style>
+</head>
+<body>
+    <div class="ui-layer" style="position: relative; height: auto;">
+        <header>
+            <a href="index.html" class="logo">AUDI</a>
+            <nav>
+                <a href="vehicles.html">Vehicles</a>
+                <a href="instructions.html" style="color: #cc0000;">Instructions</a>
+                <a href="#">Audi Sport</a>
+            </nav>
+        </header>
+        
+        <div class="instructions-container">
+            <h1>How to Use the Showroom</h1>
+            
+            <div class="instruction-step">
+                <h2>🖱️ Mouse & Touch Controls</h2>
+                <p>On desktop, simply move your mouse around the screen to experience a dynamic 3D parallax effect. On mobile devices, swipe and drag your finger across the screen to rotate and inspect the vehicle.</p>
+            </div>
+            
+            <div class="instruction-step">
+                <h2>✋ AI Hand Tracking</h2>
+                <p>Click the "Enable Hand Tracking" button to use your webcam for an immersive, touch-free experience. (Make sure to allow camera permissions when prompted!)</p>
+            </div>
+            
+            <div class="instruction-step">
+                <h2>🤏 Pinch to Rotate & Zoom</h2>
+                <p>While hand tracking is active, pinch your thumb and index finger together. While holding the pinch, move your hand left, right, up, or down to <strong>rotate</strong> the car in the showroom. Bring your pinched fingers close to the camera to <strong>zoom out</strong>, and pull them further away to <strong>zoom in</strong>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

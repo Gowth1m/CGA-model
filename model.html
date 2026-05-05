@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Viewer - Car Showroom</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loading" class="loading-overlay">Loading Car Model... 0%</div>
+    <div id="canvas-container"></div>
+    
+    <div class="ui-layer">
+        <header>
+            <a href="index.html" class="logo">AUDI</a>
+            <nav>
+                <a href="vehicles.html">Vehicles</a>
+                <a href="instructions.html">Instructions</a>
+                <a href="#">Audi Sport</a>
+            </nav>
+        </header>
+        
+        <div class="bottom-section">
+            <div class="car-info">
+                <h1 id="car-name">Model</h1>
+                <p id="car-desc">Loading specs...</p>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn">Discover More</button>
+                    <button id="webcam-btn" class="btn" style="background: transparent; color: white; border: 1px solid white;">Enable Hand Tracking</button>
+                </div>
+            </div>
+            
+            <div class="specs">
+                <div class="spec-item">
+                    <span class="spec-value" id="stat1-val">-</span>
+                    <span class="spec-label" id="stat1-lbl">Loading</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-value" id="stat2-val">-</span>
+                    <span class="spec-label" id="stat2-lbl">Loading</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-value" id="stat3-val">-</span>
+                    <span class="spec-label" id="stat3-lbl">Loading</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters to dynamically update the UI text based on selection
+        const params = new URLSearchParams(window.location.search);
+        
+        if (params.has('name')) document.getElementById('car-name').innerText = params.get('name');
+        if (params.has('desc')) document.getElementById('car-desc').innerText = params.get('desc');
+        
+        if (params.has('stat1')) document.getElementById('stat1-val').innerText = params.get('stat1');
+        if (params.has('label1')) document.getElementById('stat1-lbl').innerText = params.get('label1');
+        
+        if (params.has('stat2')) document.getElementById('stat2-val').innerText = params.get('stat2');
+        if (params.has('label2')) document.getElementById('stat2-lbl').innerText = params.get('label2');
+        
+        if (params.has('stat3')) document.getElementById('stat3-val').innerText = params.get('stat3');
+        if (params.has('label3')) document.getElementById('stat3-lbl').innerText = params.get('label3');
+        
+        document.title = params.get('name') ? (params.get('name') + ' - 3D Viewer') : '3D Viewer';
+    </script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

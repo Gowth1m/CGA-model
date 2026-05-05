@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicles - 3D Car Showroom</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        body { overflow-y: auto; background-color: #050505; }
+        .vehicles-container { padding: 4rem; max-width: 1200px; margin: 0 auto; pointer-events: auto; }
+        .vehicles-container h1 { font-size: 3rem; margin-bottom: 2rem; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Force 4 items beside each other */
+            gap: 1.5rem;
+        }
+        .card {
+            background: #1a1a1a; border: 1px solid #333; padding-bottom: 1.5rem;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+            text-decoration: none; color: white; border-radius: 8px; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-5px); border-color: #cc0000; }
+        .card model-viewer { width: 100%; height: 150px; margin-bottom: 1rem; background: #050505; border-bottom: 1px solid #333; pointer-events: none; }
+        .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; padding: 0 1rem; }
+        .card p { color: #aaa; margin-bottom: 1rem; font-size: 0.8rem; padding: 0 1rem; }
+        .card .btn { width: calc(100% - 2rem); margin: 0 1rem; padding: 0.8rem; font-size: 0.9rem; }
+
+        @media (max-width: 1100px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .vehicles-container { padding: 2rem; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } /* Keep 2 items beside each other on small screens */
+            .card model-viewer { height: 120px; }
+            .card h2 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-layer" style="position: relative; height: auto;">
+        <header>
+            <a href="index.html" class="logo">AUDI</a>
+            <nav>
+                <a href="vehicles.html" style="color: #cc0000;">Vehicles</a>
+                <a href="instructions.html">Instructions</a>
+                <a href="#">Audi Sport</a>
+            </nav>
+        </header>
+        
+        <div class="vehicles-container">
+            <h1>Select a Model</h1>
+            <div class="grid" id="vehicles-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // PASTE YOUR EXACT LIST OF MODEL NAMES HERE!
+        // The script will automatically add ".glb" and format them into the grid.
+        const modelList = [
+            { 
+                id: "Q5S", name: "Audi SQ5", desc: "Sporty and practical luxury SUV",
+                stat1: "4.7s", label1: "0-60 MPH", stat2: "349", label2: "HP", stat3: "369 lb-ft", label3: "TORQUE" 
+            },
+            { 
+                id: "R8_LMS_GT4", name: "R8 LMS GT4", desc: "Customer racing sports car",
+                stat1: "~3.0s", label1: "0-60 MPH", stat2: "495", label2: "HP", stat3: "5.2L", label3: "V10 ENGINE" 
+            },
+            { 
+                id: "R8_LMS_Ultra", name: "R8 LMS Ultra", desc: "GT3 endurance racer",
+                stat1: "~3.2s", label1: "0-60 MPH", stat2: "570", label2: "HP", stat3: "1250 kg", label3: "WEIGHT" 
+            },
+            { 
+                id: "R8_V8", name: "Audi R8 V8", desc: "The original everyday supercar",
+                stat1: "4.4s", label1: "0-60 MPH", stat2: "420", label2: "HP", stat3: "4.2L", label3: "V8 ENGINE" 
+            },
+            { 
+                id: "RS_eTron_GT", name: "RS e-tron GT", desc: "Fully electric grand tourer",
+                stat1: "3.1s", label1: "0-60 MPH", stat2: "637", label2: "HP (BOOST)", stat3: "232 mi", label3: "EPA RANGE" 
+            },
+            { 
+                id: "RS5", name: "Audi RS 5", desc: "High-performance luxury coupe",
+                stat1: "3.7s", label1: "0-60 MPH", stat2: "444", label2: "HP", stat3: "442 lb-ft", label3: "TORQUE" 
+            },
+            { 
+                id: "RS6", name: "Audi RS 6 Avant", desc: "The ultimate super wagon",
+                stat1: "3.3s", label1: "0-60 MPH", stat2: "621", label2: "HP", stat3: "190 mph", label3: "TOP SPEED" 
+            },
+            { 
+                id: "RS7", name: "Audi RS 7", desc: "Stunning performance fastback",
+                stat1: "3.3s", label1: "0-60 MPH", stat2: "621", label2: "HP", stat3: "190 mph", label3: "TOP SPEED" 
+            },
+            { 
+                id: "S5", name: "Audi S5 Coupe", desc: "Athletic and elegant two-door",
+                stat1: "4.5s", label1: "0-60 MPH", stat2: "349", label2: "HP", stat3: "369 lb-ft", label3: "TORQUE" 
+            },
+            { 
+                id: "TT_Coupe", name: "Audi TT Coupe", desc: "Iconic design and agility",
+                stat1: "5.2s", label1: "0-60 MPH", stat2: "228", label2: "HP", stat3: "258 lb-ft", label3: "TORQUE" 
+            },
+            { 
+                id: "TTRS", name: "Audi TT RS", desc: "Five-cylinder powerhouse",
+                stat1: "3.6s", label1: "0-60 MPH", stat2: "394", label2: "HP", stat3: "2.5L", label3: "5-CYL ENGINE" 
+            }
+        ];
+
+        const grid = document.getElementById('vehicles-grid');
+        
+        modelList.forEach(car => {
+            // Build URL parameters natively linking stats into the model.html URL
+            const params = new URLSearchParams({ 
+                model: `${car.id}.glb`, 
+                name: car.name, 
+                desc: car.desc,
+                stat1: car.stat1,
+                label1: car.label1,
+                stat2: car.stat2,
+                label2: car.label2,
+                stat3: car.stat3,
+                label3: car.label3
+            });
+            
+            grid.innerHTML += `
+                <a href="model.html?${params.toString()}" class="card">
+                    <model-viewer src="${car.id}.glb" auto-rotate rotation-per-second="15deg" shadow-intensity="1" exposure="0.8" environment-image="neutral" loading="lazy"></model-viewer>
+                    <h2>${car.name}</h2>
+                    <p>${car.desc}</p>
+                    <span class="btn">View in 3D</span>
+                </a>
+            `;
+        });
+    </script>
+</body>
+</html>

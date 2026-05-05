@@ -5,7 +5,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // --- CONFIGURATION ---
-const MODEL_PATH = 'car.glb'; // Change this to your actual filename!
+const urlParams = new URLSearchParams(window.location.search);
+const MODEL_PATH = urlParams.get('model') || 'R8_LMS_GT4.glb'; // Dynamically load model based on URL
 // ---------------------
 
 const container = document.getElementById('canvas-container');
@@ -85,6 +86,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.autoRotate = true;     // Add auto-rotation for the showroom effect
 controls.autoRotateSpeed = 1.0;
+controls.maxPolarAngle = Math.PI / 2; // Prevent camera from rotating below the baseline (ground)
 
 // 5. Load Model
 const dracoLoader = new DRACOLoader();
@@ -143,6 +145,9 @@ let currentY = 0;
 let useWebcam = false;
 let targetZoom = 1.0;
 let currentZoom = 1.0;
+let isPinching = false;
+let lastHandX = 0;
+let lastHandY = 0;
 
 // 1. Mouse Tracking Fallback (Creates an immediate 3D effect)
 window.addEventListener('mousemove', (e) => {
@@ -162,9 +167,20 @@ window.addEventListener('touchmove', (e) => {
 
 // 2. AI Webcam Tracking (MediaPipe)
 const webcamBtn = document.getElementById('webcam-btn');
+let cameraUtils = null; // Store globally so we can turn it off
 if (webcamBtn) {
     webcamBtn.addEventListener('click', async () => {
-        if (useWebcam) return;
+        if (useWebcam) {
+            // Turn tracking OFF
+            if (cameraUtils) cameraUtils.stop();
+            useWebcam = false;
+            webcamBtn.innerText = "Enable Hand Tracking";
+            webcamBtn.style.background = "transparent";
+            webcamBtn.style.border = "1px solid white";
+            // Gently reset view
+            targetX = 0; targetY = 0; targetZoom = 1.0;
+            return;
+        }
         
         webcamBtn.innerText = "Starting AI...";
         
@@ -189,9 +205,6 @@ if (webcamBtn) {
                 
                 // Use the center of the palm (landmark 9) for stable tracking
                 const palm = landmarks[9];
-                // Invert X for mirror effect, scale up movement for a stronger 3D shift
-                targetX = -((palm.x - 0.5) * 8);
-                targetY = -((palm.y - 0.5) * 8);
                 
                 // PINCH TO ZOOM: Calculate distance between thumb (4) and index finger (8)
                 const thumb = landmarks[4];
@@ -200,10 +213,37 @@ if (webcamBtn) {
                 
                 // Map pinch distance to zoom (spread = zoom in, pinch = zoom out)
                 targetZoom = 0.8 + (pinchDist * 4);
+                
+                // PINCH TO ROTATE & MOVE (Drag interaction)
+                const PINCH_THRESHOLD = 0.08;
+                
+                if (pinchDist < PINCH_THRESHOLD) {
+                    if (!isPinching) {
+                        isPinching = true; // Started dragging
+                        lastHandX = palm.x;
+                        lastHandY = palm.y;
+                    } else {
+                        // Calculate movement delta
+                        const deltaX = palm.x - lastHandX;
+                        const deltaY = palm.y - lastHandY;
+                        
+                        targetX -= deltaX * 15; // Update rotation based on drag distance
+                        targetY -= deltaY * 15;
+                        
+                        // Limit max rotation to prevent sliding the car off-screen and restrict upward tilt
+                        targetX = Math.max(-15, Math.min(15, targetX));
+                        targetY = Math.max(-2, Math.min(15, targetY)); // Restricted minimum to keep undercarriage hidden
+                        
+                        lastHandX = palm.x;
+                        lastHandY = palm.y;
+                    }
+                } else {
+                    isPinching = false; // Let go
+                }
             }
         });
 
-        const cameraUtils = new window.Camera(videoElement, {
+        cameraUtils = new window.Camera(videoElement, {
             onFrame: async () => { await hands.send({image: videoElement}); },
             width: 640, height: 480
         });
@@ -222,16 +262,17 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     
-    // Apply Parallax Interpolation (Increased from 0.05 to 0.25 for INSTANT responsiveness/no lag)
-    currentX += (targetX - currentX) * 0.25;
-    currentY += (targetY - currentY) * 0.25;
-    currentZoom += (targetZoom - currentZoom) * 0.25;
+    // Apply Parallax Interpolation (Reduced to 0.08 for extremely smooth, natural movement with no jitter)
+    currentX += (targetX - currentX) * 0.08;
+    currentY += (targetY - currentY) * 0.08;
+    currentZoom += (targetZoom - currentZoom) * 0.08;
     
     // Shift and tilt the scene slightly for a dynamic holographic 3D pop effect
     scene.position.x = -currentX * 0.5;
     scene.position.y = currentY * 0.5;
     scene.rotation.y = currentX * 0.1; 
-    scene.rotation.x = currentY * 0.1;
+    // Clamp the backward tilt to prevent exposing the undercarriage during parallax movements
+    scene.rotation.x = Math.max(-0.05, currentY * 0.1); 
 
     // Apply Pinch Zoom
     camera.zoom = currentZoom;
