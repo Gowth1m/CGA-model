@@ -141,6 +141,8 @@ let targetY = 0;
 let currentX = 0;
 let currentY = 0;
 let useWebcam = false;
+let targetZoom = 1.0;
+let currentZoom = 1.0;
 
 // 1. Mouse Tracking Fallback (Creates an immediate 3D effect)
 window.addEventListener('mousemove', (e) => {
@@ -168,18 +170,28 @@ if (webcamBtn) {
         }});
         hands.setOptions({ 
             maxNumHands: 1, 
-            modelComplexity: 1, 
+            modelComplexity: 0, // Reduced from 1 to 0 for MAX performance and zero lag
             minDetectionConfidence: 0.5, 
             minTrackingConfidence: 0.5 
         });
 
         hands.onResults((results) => {
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                
                 // Use the center of the palm (landmark 9) for stable tracking
-                const landmark = results.multiHandLandmarks[0][9];
+                const palm = landmarks[9];
                 // Invert X for mirror effect, scale up movement for a stronger 3D shift
-                targetX = -((landmark.x - 0.5) * 8); // Increased hand tracking sensitivity
-                targetY = -((landmark.y - 0.5) * 8);
+                targetX = -((palm.x - 0.5) * 8);
+                targetY = -((palm.y - 0.5) * 8);
+                
+                // PINCH TO ZOOM: Calculate distance between thumb (4) and index finger (8)
+                const thumb = landmarks[4];
+                const index = landmarks[8];
+                const pinchDist = Math.hypot(index.x - thumb.x, index.y - thumb.y);
+                
+                // Map pinch distance to zoom (spread = zoom in, pinch = zoom out)
+                targetZoom = 0.8 + (pinchDist * 4);
             }
         });
 
@@ -202,15 +214,20 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     
-    // Apply Parallax Interpolation (Smooth dampening filters out jitter)
-    currentX += (targetX - currentX) * 0.05;
-    currentY += (targetY - currentY) * 0.05;
+    // Apply Parallax Interpolation (Increased from 0.05 to 0.25 for INSTANT responsiveness/no lag)
+    currentX += (targetX - currentX) * 0.25;
+    currentY += (targetY - currentY) * 0.25;
+    currentZoom += (targetZoom - currentZoom) * 0.25;
     
     // Shift and tilt the scene slightly for a dynamic holographic 3D pop effect
     scene.position.x = -currentX * 0.5;
     scene.position.y = currentY * 0.5;
-    scene.rotation.y = currentX * 0.1; // Increased rotation/tilt sensitivity
+    scene.rotation.y = currentX * 0.1; 
     scene.rotation.x = currentY * 0.1;
+
+    // Apply Pinch Zoom
+    camera.zoom = currentZoom;
+    camera.updateProjectionMatrix();
 
     renderer.render(scene, camera);
 }
