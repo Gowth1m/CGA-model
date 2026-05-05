@@ -86,6 +86,18 @@ nav a:hover { color: #cc0000; }
 .spec-value { font-size: 2.5rem; font-weight: 700; }
 .spec-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
 
+.footer-credit {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+    z-index: 20;
+}
+
 /* --- MOBILE OPTIMIZATION --- */
 @media (max-width: 768px) {
     header { padding: 1.5rem; flex-direction: column; gap: 1rem; }
