@@ -9,6 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
+    <!-- Vercel Speed Insights & Web Analytics -->
+    <script type="module">
+        import { inject as injectSpeedInsights } from 'https://esm.sh/@vercel/speed-insights';
+        import { inject as injectAnalytics } from 'https://esm.sh/@vercel/analytics';
+        injectSpeedInsights();
+        injectAnalytics();
+    </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
