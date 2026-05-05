@@ -90,7 +90,7 @@ controls.maxPolarAngle = Math.PI / 2; // Prevent camera from rotating below the 
 
 // 5. Load Model
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/gltf/');
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
 const loader = new GLTFLoader();
 loader.setDRACOLoader(dracoLoader);
@@ -124,8 +124,12 @@ loader.load(MODEL_PATH,
         
         scene.add(car);
         
-        // Pre-compile shaders so the first frame renders instantly without stuttering/freezing
-        renderer.compile(scene, camera);
+        try {
+            // Pre-compile shaders so the first frame renders instantly without stuttering/freezing
+            renderer.compile(scene, camera);
+        } catch (e) {
+            console.warn("Shader pre-compilation skipped:", e);
+        }
         
         // Add a small delay before hiding the loading screen to ensure "100%" is visible
         setTimeout(() => {
@@ -133,12 +137,13 @@ loader.load(MODEL_PATH,
         }, 500); // 500ms delay
     },
     (xhr) => {
-        if (xhr.lengthComputable) {
+        if (xhr.lengthComputable && xhr.total > 0) {
             const percent = Math.round((xhr.loaded / xhr.total) * 100);
             loadingText.innerText = `Loading Car Model... ${percent}%`;
         } else {
-            // Fallback if length is not computable (e.g., server doesn't send Content-Length header)
-            loadingText.innerText = `Loading Car Model...`;
+            // Fallback if length is not computable, show downloaded MBs instead
+            const mb = (xhr.loaded / (1024 * 1024)).toFixed(2);
+            loadingText.innerText = `Loading Car Model... ${mb} MB`;
         }
     },
     (error) => {
