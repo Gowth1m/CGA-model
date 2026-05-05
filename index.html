@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Car Showroom</title>
+    <style>
+        body { 
+            margin: 0; overflow: hidden; background-color: #111; 
+            /* Make sure to paste a direct image URL (e.g., ends in .jpg), not a webpage URL! */
+            
+            background-size: cover;
+            background-position: center;
+        }
+        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); color: white;
+            display: flex; justify-content: center; align-items: center;
+            font-family: sans-serif; z-index: 10;
+        }
+        
+        /* --- AUDI UI STYLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
+        
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2; pointer-events: none; /* Let clicks pass through to the 3D canvas */
+            font-family: 'Inter', sans-serif;
+            display: flex; flex-direction: column; justify-content: space-between;
+            color: white;
+        }
+        
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 4rem; pointer-events: auto; /* Re-enable clicks for nav */
+        }
+        
+        .logo {
+            font-weight: 700; font-size: 2rem; letter-spacing: 3px;
+            color: white; text-transform: uppercase;
+        }
+        
+        nav { display: flex; gap: 2.5rem; }
+        nav a {
+            color: white; text-decoration: none; font-size: 0.9rem;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+        nav a:hover { color: #cc0000; }
+        
+        .bottom-section {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 2rem 4rem 4rem 4rem; pointer-events: auto;
+        }
+        
+        .car-info h1 {
+            font-size: 4.5rem; margin: 0; font-weight: 700; letter-spacing: -2px;
+        }
+        .car-info p {
+            font-size: 1.2rem; margin: 0.5rem 0 2rem 0; font-weight: 300; color: #ddd;
+        }
+        
+        .btn {
+            background: white; color: black; padding: 1rem 3rem;
+            border: none; font-size: 1rem; font-weight: 700; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s ease;
+        }
+        .btn:hover { background: #cc0000; color: white; }
+        
+        .specs { display: flex; gap: 3rem; text-align: right; }
+        .spec-item { display: flex; flex-direction: column; }
+        .spec-value { font-size: 2.5rem; font-weight: 700; }
+        .spec-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-overlay">Loading Car Model... 0%</div>
+    <div id="canvas-container"></div>
+    
+    <div class="ui-layer">
+        <header>
+            <div class="logo">AUDI</div>
+            <nav>
+                <a href="#">Vehicles</a>
+                <a href="#">Innovation</a>
+                <a href="#">Audi Sport</a>
+            </nav>
+        </header>
+        
+        <div class="bottom-section">
+            <div class="car-info">
+                <h1>R8 LMS</h1>
+                <p>Fully Maximised Performance. Completely Audi.</p>
+                <button class="btn">Discover More</button>
+            </div>
+            
+            <div class="specs">
+                <div class="spec-item">
+                    <span class="spec-value">3.3s</span>
+                    <span class="spec-label">0-60 MPH</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-value">637</span>
+                    <span class="spec-label">HP (BOOST)</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-value">232 mi</span>
+                    <span class="spec-label">EPA EST. RANGE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
