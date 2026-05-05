@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Car Showroom</title>
+
+    <!-- Google MediaPipe for AI Hand Tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
     <style>
         body { 
             margin: 0; overflow: hidden; background-color: #111; 
@@ -92,7 +97,10 @@
             <div class="car-info">
                 <h1>R8 LMS</h1>
                 <p>Fully Maximised Performance. Completely Audi.</p>
-                <button class="btn">Discover More</button>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn">Discover More</button>
+                    <button id="webcam-btn" class="btn" style="background: transparent; color: white; border: 1px solid white;">Enable Hand Tracking</button>
+                </div>
             </div>
             
             <div class="specs">

@@ -135,10 +135,83 @@ loader.load(MODEL_PATH,
     }
 );
 
+// --- WOW FEATURE: PARALLAX & AI WEBCAM TRACKING ---
+let targetX = 0;
+let targetY = 0;
+let currentX = 0;
+let currentY = 0;
+let useWebcam = false;
+
+// 1. Mouse Tracking Fallback (Creates an immediate 3D effect)
+window.addEventListener('mousemove', (e) => {
+    if (!useWebcam) {
+        targetX = (e.clientX / window.innerWidth - 0.5) * 5; // Increased mouse sensitivity
+        targetY = (e.clientY / window.innerHeight - 0.5) * 5;
+    }
+});
+
+// 2. AI Webcam Tracking (MediaPipe)
+const webcamBtn = document.getElementById('webcam-btn');
+if (webcamBtn) {
+    webcamBtn.addEventListener('click', async () => {
+        if (useWebcam) return;
+        
+        webcamBtn.innerText = "Starting AI...";
+        
+        const videoElement = document.createElement('video');
+        videoElement.style.display = 'none';
+        document.body.appendChild(videoElement);
+
+        // Load MediaPipe Hands from the global window object
+        const hands = new window.Hands({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }});
+        hands.setOptions({ 
+            maxNumHands: 1, 
+            modelComplexity: 1, 
+            minDetectionConfidence: 0.5, 
+            minTrackingConfidence: 0.5 
+        });
+
+        hands.onResults((results) => {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                // Use the center of the palm (landmark 9) for stable tracking
+                const landmark = results.multiHandLandmarks[0][9];
+                // Invert X for mirror effect, scale up movement for a stronger 3D shift
+                targetX = -((landmark.x - 0.5) * 8); // Increased hand tracking sensitivity
+                targetY = -((landmark.y - 0.5) * 8);
+            }
+        });
+
+        const cameraUtils = new window.Camera(videoElement, {
+            onFrame: async () => { await hands.send({image: videoElement}); },
+            width: 640, height: 480
+        });
+
+        cameraUtils.start().then(() => {
+            useWebcam = true;
+            webcamBtn.innerText = "AI Tracking Active";
+            webcamBtn.style.background = "#cc0000";
+            webcamBtn.style.border = "1px solid #cc0000";
+        });
+    });
+}
+
 // 6. Animation Loop
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
+    
+    // Apply Parallax Interpolation (Smooth dampening filters out jitter)
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+    
+    // Shift and tilt the scene slightly for a dynamic holographic 3D pop effect
+    scene.position.x = -currentX * 0.5;
+    scene.position.y = currentY * 0.5;
+    scene.rotation.y = currentX * 0.1; // Increased rotation/tilt sensitivity
+    scene.rotation.x = currentY * 0.1;
+
     renderer.render(scene, camera);
 }
 
