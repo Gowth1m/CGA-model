@@ -123,7 +123,11 @@ loader.load(MODEL_PATH,
         });
         
         scene.add(car);
-        loadingText.style.display = 'none'; // Hide loading screen
+        
+        // Pre-compile shaders so the first frame renders instantly without stuttering/freezing
+        renderer.compile(scene, camera);
+        
+        loadingText.classList.add('hidden'); // Smooth fade out
     },
     (xhr) => {
         if (xhr.lengthComputable) {
