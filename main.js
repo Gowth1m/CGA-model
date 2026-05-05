@@ -152,6 +152,14 @@ window.addEventListener('mousemove', (e) => {
     }
 });
 
+// Mobile Touch Tracking (Parallax effect for touchscreens)
+window.addEventListener('touchmove', (e) => {
+    if (!useWebcam && e.touches.length > 0) {
+        targetX = (e.touches[0].clientX / window.innerWidth - 0.5) * 5;
+        targetY = (e.touches[0].clientY / window.innerHeight - 0.5) * 5;
+    }
+}, { passive: true }); // passive: true improves performance on mobile
+
 // 2. AI Webcam Tracking (MediaPipe)
 const webcamBtn = document.getElementById('webcam-btn');
 if (webcamBtn) {
