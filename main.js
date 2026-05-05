@@ -127,17 +127,25 @@ loader.load(MODEL_PATH,
         // Pre-compile shaders so the first frame renders instantly without stuttering/freezing
         renderer.compile(scene, camera);
         
-        loadingText.classList.add('hidden'); // Smooth fade out
+        // Add a small delay before hiding the loading screen to ensure "100%" is visible
+        setTimeout(() => {
+            loadingText.classList.add('hidden'); // Smooth fade out
+        }, 500); // 500ms delay
     },
     (xhr) => {
         if (xhr.lengthComputable) {
             const percent = Math.round((xhr.loaded / xhr.total) * 100);
             loadingText.innerText = `Loading Car Model... ${percent}%`;
+        } else {
+            // Fallback if length is not computable (e.g., server doesn't send Content-Length header)
+            loadingText.innerText = `Loading Car Model...`;
         }
     },
     (error) => {
         console.error("Error loading model:", error);
-        loadingText.innerText = "Error: Model not found. Check the filename!";
+        loadingText.innerText = "Error: Model not found. Please check the filename and ensure it's in the correct directory.";
+        loadingText.style.backgroundColor = 'rgba(150, 0, 0, 0.9)'; // Make error background red
+        loadingText.style.fontSize = '1.5rem'; // Make error text larger
     }
 );
 
